@@ -1,3 +1,5 @@
 .dockerignore
 .gitignore
 Dockerfile
+LICENSE.md
+README.md
