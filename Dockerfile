@@ -1,4 +1,4 @@
 FROM golang
-ADD . /go/src/web-scraper
+ADD ./cmd/ /go/src/
 RUN go install web-scraper
 ENTRYPOINT [ "/go/bin/web-scraper" ]
