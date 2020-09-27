@@ -1,10 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 )
 
@@ -22,11 +22,11 @@ func getHTML(url string) string {
 }
 
 func main() {
-	args := os.Args[1:]
-	url := args[0]
+	url := flag.String("url", "https://google.com/", "Url to begin parsing")
+	flag.Parse()
 
-	fmt.Printf("Url: %s\n", url)
-	html := getHTML(url)
+	fmt.Printf("Url: %s\n", *url)
+	html := getHTML(*url)
 	body := getBody(html)
 	print(body)
 }
