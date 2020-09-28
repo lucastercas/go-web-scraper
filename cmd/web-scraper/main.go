@@ -2,22 +2,17 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 
-	scraper "github.com/lucastercas/web-scraper/internal/scraper"
+	"github.com/lucastercas/web-scraper/internal/racer"
 )
 
 func main() {
-	url := flag.String("url", "https://pt.wikipedia.org/wiki/Hunting", "Url to begin parsing")
+	wiki := flag.String("wiki", "https://pt.wikipedia.org", "Wiki to race")
+	begin := flag.String("begin", "Franceses", "Article to begin racing")
+	end := flag.String("end", "Galeses", "Article to end racing")
+	depth := flag.Int("depth", 3, "Depth to go for finding")
 	flag.Parse()
 
-	fmt.Printf("Url: %s\n", *url)
-	tags, err := scraper.GetAnchors(*url)
-	if err != nil {
-		os.Exit(1)
-	}
-
-	fmt.Println(tags)
+	racer.Race(*wiki, *begin, *end, *depth)
 
 }

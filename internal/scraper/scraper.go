@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -13,7 +14,7 @@ import (
 
 // Anchor represents
 type Anchor struct {
-	href string
+	Href string
 }
 
 func getHTML(url string) string {
@@ -23,25 +24,32 @@ func getHTML(url string) string {
 	return string(bytes)
 }
 
-// RenderNode ...
-func RenderNode(node *html.Node) string {
+func renderNode(node *html.Node) string {
 	var buf bytes.Buffer
 	writer := io.Writer(&buf)
 	html.Render(writer, node)
 	return buf.String()
 }
 
+func getHref(nodeString string) string {
+	hrefIndex := strings.Index(nodeString, "href")
+	hrefBegin := hrefIndex + 6
+	hrefEnd := strings.Index(nodeString[hrefBegin:], "\"")
+	return nodeString[hrefBegin : hrefBegin+hrefEnd]
+}
+
 func crawler(node *html.Node, tag string, tags *[]Anchor) {
 	if node.Type == html.ElementNode {
 		if node.Data == tag {
 			// To-Do: Ajeitar isso (ta feio)
-			nodeString := RenderNode(node)
-			hrefIndex := strings.Index(nodeString, "href")
-			hrefBegin := hrefIndex + 6
-			hrefEnd := strings.Index(nodeString[hrefBegin:], "\"")
-			href := nodeString[hrefBegin : hrefBegin+hrefEnd]
-			anchor := Anchor{href: href}
-			(*tags) = append(*tags, anchor)
+			nodeString := renderNode(node)
+			href := getHref(nodeString)
+			if matched, _ := regexp.MatchString("^/wiki/.*", href); matched {
+				anchor := Anchor{
+					Href: href,
+				}
+				(*tags) = append(*tags, anchor)
+			}
 		}
 	}
 	for child := node.FirstChild; child != nil; child = child.NextSibling {
@@ -50,14 +58,14 @@ func crawler(node *html.Node, tag string, tags *[]Anchor) {
 
 }
 
-// GetAnchors ...
-func GetAnchors(url string) ([]Anchor, error) {
+// GetTags ...
+func GetTags(url string, tag string) ([]Anchor, error) {
 	htm := getHTML(url)
 	doc, err := html.Parse(strings.NewReader(htm))
 	if err != nil {
 		return nil, errors.New("Error parsing HTML")
 	}
 	var tags []Anchor
-	crawler(doc, "a", &tags)
+	crawler(doc, tag, &tags)
 	return tags, nil
 }
