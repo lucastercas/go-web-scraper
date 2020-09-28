@@ -16,3 +16,6 @@ func main() {
 	racer.Race(*wiki, *begin, *end, *depth)
 
 }
+
+// Franceses -> Galeses
+// Franceses -> Galeses -> Roma_Antiga
